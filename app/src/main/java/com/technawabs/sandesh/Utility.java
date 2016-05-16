@@ -1,5 +1,6 @@
 package com.technawabs.sandesh;
 
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
@@ -7,17 +8,23 @@ import android.net.Uri;
 import android.provider.Contacts;
 import android.provider.ContactsContract;
 import android.provider.Telephony;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.technawabs.sandesh.pojo.Sms;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class Utility {
 
     public static String TAG = "Utility";
 
-    public static void getSMS(Context context, Cursor cursor, Uri uri) {
+    public static List<Sms> getSMS(Context context, Cursor cursor, Uri uri) {
+        List<Sms> smsList = new ArrayList<Sms>();
         StringBuilder smsBuilder = new StringBuilder();
         try {
             while (cursor.moveToNext()) {
@@ -30,7 +37,7 @@ public class Utility {
                     String photoUri = null;
                     if (address != null) {
                         if (address.length() > 0) {
-// getting contact by contact number
+                            // getting contact by contact number
                             String[] contactData = Utility.getContactByNumber(context, address);
                             if (contactData != null) {
                                 name = contactData[0];
@@ -44,6 +51,13 @@ public class Utility {
                     int int_Type = cur.getInt(cur.getColumnIndexOrThrow("type"));
                     long longDate = cur.getLong(cur.getColumnIndexOrThrow("date"));
                     String dateString = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(new Date(longDate));
+                    final Sms sms = new Sms();
+                    sms.setADDRESS(address);
+                    sms.setPERSON(TextUtils.isDigitsOnly(name) ? name : address);
+                    sms.setIMAGE_URI(TextUtils.isEmpty(photoUri) ? photoUri : "");
+                    sms.setBODY(body);
+                    sms.setDATE(dateString);
+                    smsList.add(sms);
                     smsBuilder.append("[ ");
                     smsBuilder.append(address + ", ");
                     smsBuilder.append(name + ", ");
@@ -61,7 +75,7 @@ public class Utility {
             Log.i(TAG, e.getMessage());
         }
         cursor.close();
-        System.out.println(smsBuilder.toString());
+        return smsList;
     }
 
     /**
@@ -96,6 +110,59 @@ public class Utility {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static List<Sms> getAllSmsFromProvider(Context context, Uri uri) {
+        List<Sms> lstSms = new ArrayList<Sms>();
+        ContentResolver cr = context.getContentResolver();
+
+        String[] projection = new String[]{"_id", "thread_id","person", "address", "body", "date", "type"};
+        Cursor c = context.getContentResolver().query(uri, projection, null, null,
+                "date" + " COLLATE LOCALIZED DESC");
+        int totalSMS = c.getCount();
+        if (c.moveToFirst()) {
+            for (int i = 0; i < totalSMS; i++) {
+                final Sms sms = new Sms();
+                sms.set_ID(c.getString(0));
+                sms.setPERSON(c.getString(2));
+                sms.setADDRESS(c.getString(3));
+                sms.setBODY(c.getString(4));
+                sms.setDATE(c.getString(5));
+                lstSms.add(sms);
+                c.moveToNext();
+            }
+        } else {
+            throw new RuntimeException("You have no SMS in Inbox");
+        }
+        c.close();
+        return lstSms;
+    }
+
+    public static List<Sms> getAllSmsFromAddress(Context context, Uri uri,String address) {
+        List<Sms> lstSms = new ArrayList<Sms>();
+        String[] phoneNumber = new String[] { "*" };
+        String[] projection = new String[]{"_id", "thread_id","person", "address", "body", "date", "type"};
+        Cursor c = context.getContentResolver().query(uri, phoneNumber, null,null,
+                "date" + " COLLATE LOCALIZED DESC");
+//        Cursor c = context.getContentResolver().query(uri, projection, "address=?",phoneNumber,
+//                "date" + " COLLATE LOCALIZED DESC");
+        int totalSMS = c.getCount();
+        if (c.moveToFirst()) {
+            for (int i = 0; i < totalSMS; i++) {
+                final Sms sms = new Sms();
+                sms.set_ID(c.getString(0));
+                sms.setPERSON(c.getString(2));
+                sms.setADDRESS(c.getString(3));
+                sms.setBODY(c.getString(4));
+                sms.setDATE(c.getString(5));
+                lstSms.add(sms);
+                c.moveToNext();
+            }
+        } else {
+            throw new RuntimeException("You have no SMS in Inbox");
+        }
+        c.close();
+        return lstSms;
     }
 
     /**

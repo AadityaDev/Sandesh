@@ -1,4 +1,4 @@
-package com.technawabs.sandesh;
+package com.technawabs.sandesh.pojo;
 
 import android.util.Log;
 
