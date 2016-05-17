@@ -1,14 +1,27 @@
 package com.technawabs.sandesh.tabs;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.technawabs.sandesh.R;
+import com.technawabs.sandesh.SandeshConstants;
+import com.technawabs.sandesh.Utility;
+import com.technawabs.sandesh.activities.SmsDetail;
+import com.technawabs.sandesh.adapter.SmsAdapter;
+import com.technawabs.sandesh.pojo.Sms;
+import com.technawabs.sandesh.uicomponents.ItemClickSupport;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,6 +32,11 @@ import com.technawabs.sandesh.R;
  * create an instance of this fragment.
  */
 public class Chat extends Fragment {
+
+    private List<Sms> smsList;
+    private RecyclerView recList;
+    private LinearLayoutManager linearLayoutManager;
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -65,7 +83,34 @@ public class Chat extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_chat, container, false);
+        View view = inflater.inflate(R.layout.fragment_chat, container, false);
+        recList = (RecyclerView) view.findViewById(R.id.chat_list);
+        recList.setHasFixedSize(true);
+        linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recList.setLayoutManager(linearLayoutManager);
+        smsList = new ArrayList<>();
+        final SmsAdapter smsAdapter = new SmsAdapter(smsList);
+        recList.setAdapter(smsAdapter);
+        try {
+            smsList.addAll(Utility.getAllSmsFromProvider(getContext(),
+                    Uri.parse(SandeshConstants.SMS_CONVERSATION)));
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "No Messages Found", Toast.LENGTH_SHORT).show();
+        }
+        smsAdapter.notifyDataSetChanged();
+        ItemClickSupport.addTo(recList).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+            @Override
+            public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                Intent i = new Intent(getContext(), SmsDetail.class);
+                Bundle b = new Bundle();
+                b.putString("id", smsAdapter.getId(position));
+                b.putString("address", smsAdapter.getAddress(position));
+                i.putExtras(b);
+                startActivity(i);
+            }
+        });
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

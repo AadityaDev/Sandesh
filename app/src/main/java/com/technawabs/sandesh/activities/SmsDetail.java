@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.technawabs.sandesh.R;
@@ -18,6 +19,7 @@ import java.util.List;
 
 public class SmsDetail extends AppCompatActivity {
 
+    private final String TAG=getClass().getName();
     private List<Sms> smsList;
     private RecyclerView recList;
     private LinearLayoutManager linearLayoutManager;
@@ -36,6 +38,7 @@ public class SmsDetail extends AppCompatActivity {
         smsList = new ArrayList<>();
         final SmsAdapter smsAdapter = new SmsAdapter(smsList);
         recList.setAdapter(smsAdapter);
+        Log.i(TAG,bundle.getString("address"));
         try {
             smsList.addAll(Utility.getAllSmsFromAddress(getApplicationContext(),
                     Uri.parse(SandeshConstants.SMS_CONVERSATION), bundle.getString("address")));

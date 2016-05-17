@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.technawabs.sandesh.R;
 import com.technawabs.sandesh.SandeshConstants;
@@ -97,7 +98,7 @@ public class Inbox extends Fragment {
             smsList.addAll(Utility.getAllSmsFromProvider(getContext(),
                     Uri.parse(SandeshConstants.INBOX_SMS)));
         } catch (Exception e) {
-
+            Toast.makeText(getContext(),"No Messages Found",Toast.LENGTH_SHORT).show();
         }
         smsAdapter.notifyDataSetChanged();
         ItemClickSupport.addTo(recList).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {

@@ -14,12 +14,12 @@ import com.technawabs.sandesh.tabs.Inbox;
 import com.technawabs.sandesh.tabs.Sent;
 import com.technawabs.sandesh.uicomponents.SlidingTabLayout;
 
-public class MainActivity extends AppCompatActivity implements Inbox.OnFragmentInteractionListener,Sent.OnFragmentInteractionListener,Chat.OnFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity implements Inbox.OnFragmentInteractionListener, Sent.OnFragmentInteractionListener, Chat.OnFragmentInteractionListener {
 
     ViewPager pager;
     ViewPagerAdapter adapter;
     SlidingTabLayout tabs;
-    CharSequence Titles[] = {"INBOX", "SENT", "CONTACTS"};
+    CharSequence Titles[] = {"INBOX", "CHAT", "CONTACTS"};
     int NumbOfTabs = 3;
 
     @Override
@@ -72,11 +72,11 @@ class ViewPagerAdapter extends FragmentStatePagerAdapter {
                 Inbox inbox = new Inbox();
                 return inbox;
             case 1:
-                Sent sent = new Sent();
-                return sent;
-            case 2:
                 Chat chat = new Chat();
                 return chat;
+            case 2:
+                Sent sent = new Sent();
+                return sent;
             default:
                 return null;
         }
@@ -89,7 +89,6 @@ class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-//        return super.getPageTitle(position);
         return Titles[position];
     }
 }
