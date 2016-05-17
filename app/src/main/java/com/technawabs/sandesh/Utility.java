@@ -4,19 +4,22 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.Contacts;
 import android.provider.ContactsContract;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.technawabs.sandesh.pojo.PhoneContact;
 import com.technawabs.sandesh.pojo.Sms;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,102 +30,8 @@ public class Utility {
 
     public static String TAG = "Utility";
 
-    public static List<Sms> getSMS(Context context, Cursor cursor, Uri uri) {
-        List<Sms> smsList = new ArrayList<Sms>();
-        StringBuilder smsBuilder = new StringBuilder();
-        try {
-            while (cursor.moveToNext()) {
-                String[] projection = new String[]{"_id", "address", "thread_id", "body", "date", "type"};
-                Cursor cur = context.getContentResolver().query(uri, projection, "thread_id=?", new String[]{cursor.getString(0)},
-                        "date" + " COLLATE LOCALIZED DESC");
-                if (cur.moveToNext()) {
-                    String address = cur.getString(cur.getColumnIndex("address"));
-                    String name = null;
-                    String photoUri = null;
-                    if (address != null) {
-                        if (address.length() > 0) {
-                            // getting contact by contact number
-                            String[] contactData = Utility.getContactByNumber(context, address);
-                            if (contactData != null) {
-                                name = contactData[0];
-                                if (contactData[1] != null)
-                                    photoUri = contactData[1];
-                            }
-                        } else
-                            address = null;
-                    }
-                    String body = cur.getString(cur.getColumnIndexOrThrow("body"));
-                    int int_Type = cur.getInt(cur.getColumnIndexOrThrow("type"));
-                    long longDate = cur.getLong(cur.getColumnIndexOrThrow("date"));
-                    String dateString = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(new Date(longDate));
-                    final Sms sms = new Sms();
-                    sms.setADDRESS(address);
-                    sms.setPERSON(TextUtils.isDigitsOnly(name) ? name : address);
-                    sms.setIMAGE_URI(TextUtils.isEmpty(photoUri) ? photoUri : "");
-                    sms.setBODY(body);
-                    sms.setDATE(dateString);
-                    smsList.add(sms);
-                    smsBuilder.append("[ ");
-                    smsBuilder.append(address + ", ");
-                    smsBuilder.append(name + ", ");
-                    smsBuilder.append(body + ", ");
-                    smsBuilder.append(longDate + ", ");
-                    smsBuilder.append(int_Type + ", ");
-                    smsBuilder.append(photoUri);
-                    smsBuilder.append(" ]\n\n");
-                }
-                cur.close();
-            }
-        } catch (Exception e) {
-            Log.i(TAG, e.getMessage());
-        } catch (OutOfMemoryError e) {
-            Log.i(TAG, e.getMessage());
-        }
-        cursor.close();
-        return smsList;
-    }
-
-    private static String[] getContactByNumber(Context context, final String number) {
-        String[] data = new String[2];
-        try {
-            Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
-                    Uri.encode(number));
-            Cursor cur = context.getContentResolver().query(uri,
-                    new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME, ContactsContract.PhoneLookup._ID},
-                    null, null, null);
-            if (cur.moveToFirst()) {
-                int nameIdx = cur.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME);
-                data[0] = cur.getString(nameIdx);
-                String contactId = cur.getString(cur
-                        .getColumnIndex(ContactsContract.PhoneLookup._ID));
-                String photoUri = getContactPhotoUri(Long.parseLong(contactId));
-                if (photoUri != null)
-                    data[1] = photoUri;
-                else
-                    data[1] = null;
-                cur.close();
-                return data;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private static String getContactPhotoUri(long contactId) {
-        Uri photoUri = ContentUris.withAppendedId(Contacts.CONTENT_URI,
-                contactId);
-        String imagePath = null;
-        if (photoUri != null) {
-            imagePath = photoUri.toString();
-        }
-        return imagePath;
-    }
-
     public static List<Sms> getAllSmsFromProvider(Context context, Uri uri) {
         List<Sms> lstSms = new ArrayList<Sms>();
-        ContentResolver cr = context.getContentResolver();
-
         String[] projection = new String[]{"_id", "thread_id", "person", "address", "body", "date", "type"};
         Cursor c = context.getContentResolver().query(uri, projection, null, null,
                 "date" + " COLLATE LOCALIZED DESC");
@@ -197,4 +106,39 @@ public class Utility {
         phones.close();
         return phoneContactList;
     }
+
+    public static void writeToFile(Context context, String data, String fileName) {
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(fileName, Context.MODE_PRIVATE));
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+            Toast.makeText(context, "Data saved", Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            Toast.makeText(context, "Failed to write in file", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public static String readFromFile(Context context, String fileName) {
+        String ret = "";
+        try {
+            InputStream inputStream = context.openFileInput(fileName);
+            if (inputStream != null) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+                while ((receiveString = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(receiveString);
+                }
+                inputStream.close();
+                ret = stringBuilder.toString();
+            }
+        } catch (FileNotFoundException e) {
+            Toast.makeText(context, "File not found", Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            Toast.makeText(context, "Can not read file: ", Toast.LENGTH_LONG).show();
+        }
+        return ret;
+    }
+
 }
