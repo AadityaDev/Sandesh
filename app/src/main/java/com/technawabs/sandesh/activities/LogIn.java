@@ -19,6 +19,7 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 import com.technawabs.sandesh.R;
+import com.technawabs.sandesh.UserStore;
 
 import org.json.JSONException;
 
@@ -29,12 +30,17 @@ public class LogIn extends AppCompatActivity implements GoogleApiClient.OnConnec
     private final String TAG = getClass().getName();
     private static final int RC_SIGN_IN = 9001;
     private GoogleApiClient mGoogleApiClient;
-    private Button signInEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log_in);
+
+        UserStore userStore=new UserStore(getApplicationContext());
+        if(userStore.getLoggedIn()==true){
+            startActivity(new Intent(this,MainActivity.class));
+            finish();
+        }
 
         getSupportActionBar().hide();
         findViewById(R.id.sign_in_button).setOnClickListener(this);
@@ -93,7 +99,11 @@ public class LogIn extends AppCompatActivity implements GoogleApiClient.OnConnec
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
             Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_LONG).show();
-            startActivity();
+            //Create Login
+            UserStore userStore=new UserStore(getApplicationContext());
+            userStore.createLoginSession();
+            startActivity(new Intent(this,MainActivity.class));
+            finish();
         } else {
             result.getStatus();
             Toast.makeText(getApplicationContext(), "Error Occurred!", Toast.LENGTH_LONG).show();
