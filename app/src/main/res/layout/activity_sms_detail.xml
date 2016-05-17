@@ -11,4 +11,23 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/action_bar" />
 
+    <EditText
+        android:id="@+id/compose_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="54dp"
+        android:layout_marginRight="54dp"
+        android:inputType="textCapSentences|textMultiLine"
+        android:padding="6dp" />
+
+    <ImageView
+        android:id="@+id/send_message"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:src="@mipmap/ic_send" />
+
 </RelativeLayout>

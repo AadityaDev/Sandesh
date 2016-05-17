@@ -106,8 +106,7 @@ public class Sent extends Fragment {
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                 Intent i = new Intent(getContext(), SmsDetail.class);
                 Bundle b = new Bundle();
-                b.putString("id", smsAdapter.getId(position));
-                b.putString("address", smsAdapter.getAddress(position));
+                b.putString("address", smsAdapter.getNumber(position));
                 i.putExtras(b);
                 startActivity(i);
             }
@@ -144,7 +143,7 @@ public class Sent extends Fragment {
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
      * activity.
-     * <p/>
+     * <p>
      * See the Android Training lesson <a href=
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.

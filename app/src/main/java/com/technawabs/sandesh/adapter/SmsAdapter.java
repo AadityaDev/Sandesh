@@ -1,7 +1,6 @@
 package com.technawabs.sandesh.adapter;
 
 import android.content.Context;
-import android.support.v4.text.TextUtilsCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -52,24 +51,28 @@ public class SmsAdapter extends RecyclerView.Adapter<SmsAdapter.SmsViewHolder> {
 
     @Override
     public int getItemCount() {
-        if(isContact){
+        if (isContact) {
             return phoneContactList.size();
-        }else {
+        } else {
             return smsList.size();
         }
 
     }
 
     public String getId(int position) {
-        if(isContact){
+        if (isContact) {
             return phoneContactList.get(position).getId();
-        }else {
+        } else {
             return smsList.get(position).get_ID();
         }
     }
 
     public String getAddress(int position) {
         return smsList.get(position).getADDRESS();
+    }
+
+    public String getNumber(int position) {
+        return phoneContactList.get(position).getNumber();
     }
 
     public static class SmsViewHolder extends RecyclerView.ViewHolder {
