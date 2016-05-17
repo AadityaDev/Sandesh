@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "719222544636",
+    "project_id": "sandesh-96185"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:719222544636:android:6a3be406aeddedc5",
+        "android_client_info": {
+          "package_name": "com.technawabs.sandesh"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "719222544636-aomviam8o8s4dlc7v07161oqsbn1i8lf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.technawabs.sandesh",
+            "certificate_hash": "67AB88E063DC4C2C0A9C8C2B13B0AF5F23D86993"
+          }
+        },
+        {
+          "client_id": "719222544636-cqql67beoe9l2d5i5vgi7okean4ro2v8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-LZh5T4Xo-qltbenuz6rzfruAHlVdh8w"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

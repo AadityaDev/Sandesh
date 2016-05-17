@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Sandesh</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
+    <string name="server_client_id">719222544636-cqql67beoe9l2d5i5vgi7okean4ro2v8.apps.googleusercontent.com</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
