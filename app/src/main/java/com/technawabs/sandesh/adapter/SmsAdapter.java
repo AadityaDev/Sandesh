@@ -11,55 +11,78 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.technawabs.sandesh.R;
+import com.technawabs.sandesh.pojo.PhoneContact;
 import com.technawabs.sandesh.pojo.Sms;
 
 import java.util.List;
 
-public class SmsAdapter extends RecyclerView.Adapter<SmsAdapter.SmsViewHolder>{
+public class SmsAdapter extends RecyclerView.Adapter<SmsAdapter.SmsViewHolder> {
 
     private List<Sms> smsList;
+    private List<PhoneContact> phoneContactList;
+    private boolean isContact;
 
-    public SmsAdapter (List<Sms> smsList){
-        this.smsList=smsList;
+    public SmsAdapter(List<PhoneContact> phoneContactList, boolean isContact) {
+        this.phoneContactList = phoneContactList;
+        this.isContact = isContact;
+    }
+
+    public SmsAdapter(List<Sms> smsList) {
+        this.smsList = smsList;
     }
 
     @Override
     public SmsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.sms_card, parent, false);
-        return new SmsViewHolder(parent.getContext(),itemView);
+        return new SmsViewHolder(parent.getContext(), itemView);
     }
 
     @Override
     public void onBindViewHolder(SmsViewHolder holder, int position) {
-        final Sms sms=smsList.get(position);
-        holder.senderName.setText(TextUtils.isEmpty(sms.getPERSON())?sms.getADDRESS():sms.getPERSON());
-        holder.senderMessage.setText(sms.getBODY());
+        if (isContact) {
+            final PhoneContact phoneContact = phoneContactList.get(position);
+            holder.senderName.setText(phoneContact.getName());
+            holder.senderMessage.setText(phoneContact.getNumber());
+        } else {
+            final Sms sms = smsList.get(position);
+            holder.senderName.setText(TextUtils.isEmpty(sms.getPERSON()) ? sms.getADDRESS() : sms.getPERSON());
+            holder.senderMessage.setText(sms.getBODY());
+        }
     }
 
     @Override
     public int getItemCount() {
-        return smsList.size();
+        if(isContact){
+            return phoneContactList.size();
+        }else {
+            return smsList.size();
+        }
+
     }
 
     public String getId(int position) {
-        return smsList.get(position).get_ID();
+        if(isContact){
+            return phoneContactList.get(position).getId();
+        }else {
+            return smsList.get(position).get_ID();
+        }
     }
 
-    public String getAddress(int position){
+    public String getAddress(int position) {
         return smsList.get(position).getADDRESS();
     }
 
-    public static class SmsViewHolder extends RecyclerView.ViewHolder{
+    public static class SmsViewHolder extends RecyclerView.ViewHolder {
 
         public TextView senderName;
         public TextView senderMessage;
         public ImageView senderImage;
 
-        public SmsViewHolder(Context context,View itemView) {
+        public SmsViewHolder(Context context, View itemView) {
             super(itemView);
-            senderName=(TextView)itemView.findViewById(R.id.sender_name);
-            senderMessage=(TextView)itemView.findViewById(R.id.sender_message);
-            senderImage=(ImageView)itemView.findViewById(R.id.sender_image);
+            senderName = (TextView) itemView.findViewById(R.id.sender_name);
+            senderMessage = (TextView) itemView.findViewById(R.id.sender_message);
+            senderImage = (ImageView) itemView.findViewById(R.id.sender_image);
         }
     }
 }

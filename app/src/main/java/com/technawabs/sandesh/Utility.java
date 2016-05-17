@@ -4,14 +4,19 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.Contacts;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.technawabs.sandesh.pojo.PhoneContact;
 import com.technawabs.sandesh.pojo.Sms;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -168,5 +173,28 @@ public class Utility {
         }
         c.close();
         return lstSms;
+    }
+
+    public static List<PhoneContact> getContacts(Context context) {
+        List<PhoneContact> phoneContactList = new ArrayList<>();
+        int count = 0;
+        Cursor phones = context.getContentResolver().query(
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null,
+                null, null);
+        while (phones.moveToNext()) {
+            count++;
+            String name = phones
+                    .getString(phones
+                            .getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+            String phoneNumber = phones
+                    .getString(phones
+                            .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+            PhoneContact phoneContact = new PhoneContact();       // creating an instance for contactmodel
+            phoneContact.setName(name);
+            phoneContact.setNumber(phoneNumber);
+            phoneContactList.add(phoneContact);                                               // adding contacts into the list
+        }
+        phones.close();
+        return phoneContactList;
     }
 }
